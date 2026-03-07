@@ -234,7 +234,7 @@ mod tests {
     fn test_immutable_sorted_map() {
         // Java: ImmutableSortedMap.of("b", 2, "a", 1) → ordered by key
         let map = immutable_sorted_map([("b", 2), ("a", 1), ("c", 3)]);
-        let keys: Vec<&&str> = map.keys().collect();
+        let keys: Vec<_> = map.keys().collect();
         assert_eq!(keys, vec![&"a", &"b", &"c"]); // sorted
     }
 
@@ -261,7 +261,7 @@ mod tests {
         // Java: ImmutableSortedSet.of("c", "a", "b") → ["a", "b", "c"]
         let set = immutable_sorted_set(["c", "a", "b"]);
         let items: Vec<&&str> = set.iter().collect();
-        assert_eq!(items[0], &&"a");
+        assert_eq!(*items[0], "a");
     }
 
     // ── Guava Optional テスト ────────────────────

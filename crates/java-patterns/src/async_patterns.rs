@@ -56,10 +56,7 @@ where
 ///   future.thenCompose(data -> CompletableFuture.supplyAsync(() -> process(data)))
 ///
 /// Rust: async ブロックで直接チェーン
-pub async fn then_compose<T, R, Fut, F>(
-    first: impl std::future::Future<Output = T>,
-    f: F,
-) -> R
+pub async fn then_compose<T, R, Fut, F>(first: impl std::future::Future<Output = T>, f: F) -> R
 where
     F: FnOnce(T) -> Fut,
     Fut: std::future::Future<Output = R>,
@@ -156,7 +153,7 @@ pub fn countdown_latch() -> (oneshot::Sender<()>, oneshot::Receiver<()>) {
 pub async fn full_pipeline_example() -> String {
     let result: Result<String> = async {
         // supplyAsync → spawn_blocking for CPU-bound work
-        let data = tokio::task::spawn_blocking(|| fetch_data_sync())
+        let data = tokio::task::spawn_blocking(fetch_data_sync)
             .await
             .map_err(|e| anyhow::anyhow!("{}", e))?;
 
