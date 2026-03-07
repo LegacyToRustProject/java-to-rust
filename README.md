@@ -23,6 +23,23 @@ Java project (source + running instance)
 Verified Rust binary
 ```
 
+## Version Compatibility
+
+Java's LTS versions are the priority. Enterprises rarely upgrade beyond their current LTS.
+
+| Java Version | Priority | Notes |
+|--------------|----------|-------|
+| 8 (LTS) | **First** | Still #1 in enterprise. ~35% of production. No modules. |
+| 11 (LTS) | **First** | Second most common LTS. var, HTTP client. |
+| 17 (LTS) | Second | Records, sealed classes, pattern matching. Growing fast. |
+| 21 (LTS) | Third | Virtual threads, latest LTS. Modern projects. |
+| 6/7 | Fourth | Ancient but still running in banks. Simpler = easier. |
+| Jakarta EE 9+ | Second | javax → jakarta namespace migration. |
+
+Older Java (6/7/8) is the easiest to convert: no modules, no records, no sealed classes. Just classes, interfaces, and inheritance — maps cleanly to Rust traits and structs.
+
+Auto-detection: `java-to-rust analyze` detects Java version from `pom.xml`, `build.gradle`, or bytecode version.
+
 ## Key Challenges
 
 | Java Feature | Conversion Strategy |
