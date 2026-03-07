@@ -194,9 +194,7 @@ fn cmd_convert_file(
     }
 
     // Write output
-    let output_dir = output.unwrap_or_else(|| {
-        PathBuf::from("output").join(&result.module_name)
-    });
+    let output_dir = output.unwrap_or_else(|| PathBuf::from("output").join(&result.module_name));
     std::fs::create_dir_all(output_dir.join("src"))?;
 
     // Write Cargo.toml

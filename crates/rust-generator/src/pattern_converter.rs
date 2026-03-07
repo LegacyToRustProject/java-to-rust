@@ -244,10 +244,7 @@ impl PatternConverter {
                 format!("{}.map(|s| s.trim().to_string())", p(0))
             }
             ("reverse", true) => {
-                format!(
-                    "{}.map(|s| s.chars().rev().collect::<String>())",
-                    p(0)
-                )
+                format!("{}.map(|s| s.chars().rev().collect::<String>())", p(0))
             }
             ("capitalize", true) => {
                 format!(
@@ -283,12 +280,7 @@ impl PatternConverter {
         }
     }
 
-    fn generate_module(
-        &self,
-        _module_name: &str,
-        fns: &[ConvertedFn],
-        file: &JavaFile,
-    ) -> String {
+    fn generate_module(&self, _module_name: &str, fns: &[ConvertedFn], file: &JavaFile) -> String {
         let mut out = String::new();
 
         // Header comment
@@ -371,7 +363,8 @@ fn sanitize_type(java_type: &str) -> String {
     // Handle generics like List<String> → Vec<String>
     if java_type.contains('<') {
         // Replace Java wildcards with Box<dyn Any>
-        let java_type = java_type.replace("? extends", "Box<dyn std::any::Any>")
+        let java_type = java_type
+            .replace("? extends", "Box<dyn std::any::Any>")
             .replace("? super", "Box<dyn std::any::Any>")
             .replace("?", "Box<dyn std::any::Any>");
         let java_type = java_type.as_str();
@@ -383,7 +376,8 @@ fn sanitize_type(java_type: &str) -> String {
         };
         match outer {
             "List" | "ArrayList" | "LinkedList" => {
-                return java_type.replace("ArrayList<", "Vec<")
+                return java_type
+                    .replace("ArrayList<", "Vec<")
                     .replace("LinkedList<", "Vec<")
                     .replace("List<", "Vec<");
             }
@@ -407,8 +401,8 @@ fn sanitize_type(java_type: &str) -> String {
                 // Erase inner type — use Vec
                 return "Vec<Box<dyn std::any::Any>>".to_string();
             }
-            "Supplier" | "Callable" | "Function" | "BiFunction"
-            | "Predicate" | "Consumer" | "BiConsumer" | "Comparator" => {
+            "Supplier" | "Callable" | "Function" | "BiFunction" | "Predicate" | "Consumer"
+            | "BiConsumer" | "Comparator" => {
                 // Java functional interfaces → opaque function type
                 return "Box<dyn std::any::Any>".to_string();
             }
@@ -426,7 +420,9 @@ fn sanitize_type(java_type: &str) -> String {
     match java_type {
         "Supplier" | "Callable" => return "Box<dyn Fn() -> Box<dyn std::any::Any>>".to_string(),
         "Runnable" => return "Box<dyn Fn()>".to_string(),
-        "Iterable" | "Iterator" => return "Box<dyn Iterator<Item = Box<dyn std::any::Any>>>".to_string(),
+        "Iterable" | "Iterator" => {
+            return "Box<dyn Iterator<Item = Box<dyn std::any::Any>>>".to_string();
+        }
         "Comparable" => return "Box<dyn std::cmp::PartialOrd>".to_string(),
         _ => {}
     }
