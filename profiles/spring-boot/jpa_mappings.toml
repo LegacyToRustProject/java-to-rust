@@ -1,0 +1,28 @@
+[annotations]
+"Entity" = "#[derive(Clone, Debug, DeriveEntityModel)]"
+"Table" = "#[sea_orm(table_name = \"...\")]"
+"Column" = "#[sea_orm(column_name = \"...\")]"
+"Id" = "#[sea_orm(primary_key)]"
+"GeneratedValue" = "#[sea_orm(auto_increment)]"
+"ManyToOne" = "Related<Entity>"
+"OneToMany" = "Related<Entity>"
+"ManyToMany" = "Related<Entity> via junction"
+"JoinColumn" = "impl Related<Entity>"
+"Enumerated" = "#[sea_orm(column_type = \"String\")]"
+"Lob" = "#[sea_orm(column_type = \"Text\")]"
+
+[types]
+"EntityManager" = "sea_orm::DatabaseConnection"
+"CriteriaBuilder" = "sea_orm::Condition"
+"CriteriaQuery" = "sea_orm::Select"
+"TypedQuery" = "sea_orm statement"
+"JpaRepository" = "sea_orm entity + custom repository struct"
+
+[methods]
+"persist" = "insert(db).await"
+"merge" = "update(db).await"
+"remove" = "delete(db).await"
+"find" = "find_by_id(id).one(db).await"
+"createQuery" = "Entity::find().filter(...)"
+"getResultList" = ".all(db).await"
+"getSingleResult" = ".one(db).await"

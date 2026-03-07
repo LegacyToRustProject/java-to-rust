@@ -1,0 +1,45 @@
+[types]
+# Standard Java → Rust type mappings
+"int" = "i32"
+"long" = "i64"
+"float" = "f32"
+"double" = "f64"
+"boolean" = "bool"
+"char" = "char"
+"byte" = "u8"
+"short" = "i16"
+"void" = "()"
+"String" = "String"
+"Object" = "Box<dyn std::any::Any>"
+"Integer" = "i32"
+"Long" = "i64"
+"Float" = "f32"
+"Double" = "f64"
+"Boolean" = "bool"
+
+[collections]
+"ArrayList" = "Vec"
+"LinkedList" = "VecDeque"
+"HashMap" = "HashMap"
+"TreeMap" = "BTreeMap"
+"HashSet" = "HashSet"
+"TreeSet" = "BTreeSet"
+"List" = "Vec"
+"Map" = "HashMap"
+"Set" = "HashSet"
+"Queue" = "VecDeque"
+"Stack" = "Vec"
+
+[patterns]
+"null_check" = "Option<T> with .is_some() / .is_none()"
+"try_catch" = "Result<T, E> with ? operator"
+"synchronized" = "std::sync::Mutex / RwLock"
+"instanceof" = "match or downcast_ref"
+"enum_with_methods" = "enum + impl block"
+"builder_pattern" = "builder pattern with consuming self"
+"singleton" = "OnceCell or lazy_static"
+"iterator" = "impl Iterator"
+"stream_api" = "iter().map().filter().collect()"
+
+[notes]
+description = "Generic Java conversion profile. No framework-specific mappings."

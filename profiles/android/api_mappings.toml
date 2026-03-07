@@ -1,0 +1,18 @@
+[annotations]
+# Android-specific annotations (backend/server code only)
+"Provides" = "pub fn providing_instance()"
+"Inject" = "function argument"
+"Module" = "module with factory functions"
+"Singleton" = "OnceCell<T>"
+
+[types]
+"Context" = "AppState"
+"Intent" = "// Message or command struct"
+"Bundle" = "HashMap<String, serde_json::Value>"
+"SharedPreferences" = "HashMap<String, String> or config file"
+"ContentValues" = "HashMap<String, serde_json::Value>"
+"Cursor" = "Vec<Row>"
+"SQLiteDatabase" = "sea_orm::DatabaseConnection"
+
+[notes]
+description = "Android backend/server code conversion. UI-specific code (Activity, Fragment, View) should be manually reviewed."

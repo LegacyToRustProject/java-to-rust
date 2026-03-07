@@ -1,0 +1,29 @@
+[annotations]
+"Stateless" = "plain struct"
+"Stateful" = "struct with state"
+"Singleton" = "OnceCell<T> or lazy_static"
+"MessageDriven" = "tokio channel consumer"
+"EJB" = "function argument or State"
+"Inject" = "function argument or State"
+"Named" = "// Named bean - use direct construction"
+"ManagedBean" = "struct"
+"SessionScoped" = "session storage middleware"
+"RequestScoped" = "request extension"
+"ApplicationScoped" = "static / OnceCell"
+"WebServlet" = "axum handler function"
+"WebFilter" = "tower middleware"
+"WebListener" = "startup hook"
+
+[types]
+"HttpServletRequest" = "axum::extract::Request"
+"HttpServletResponse" = "axum::response::Response"
+"HttpSession" = "tower_sessions::Session"
+"ServletContext" = "axum::extract::State<AppState>"
+"InitialContext" = "// Direct construction"
+"DataSource" = "sea_orm::DatabaseConnection"
+
+[patterns]
+"JNDI_lookup" = "direct_construction_or_config"
+"JMS_producer" = "tokio::sync::mpsc::Sender"
+"JMS_consumer" = "tokio::sync::mpsc::Receiver"
+"Timer" = "tokio::time::interval"
