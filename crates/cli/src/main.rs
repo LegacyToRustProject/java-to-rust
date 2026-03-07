@@ -51,6 +51,23 @@ enum Commands {
         #[arg(long, default_value = "10")]
         max_fix_iterations: usize,
     },
+    /// Convert a single Java file to Rust using pattern-based conversion (no LLM required)
+    ConvertFile {
+        /// Path to the Java source file (.java)
+        file: PathBuf,
+
+        /// Output directory (default: ./output/<ClassName>)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+
+        /// Run cargo check on the generated output
+        #[arg(long)]
+        verify: bool,
+
+        /// Print conversion summary (skipped methods, etc.)
+        #[arg(long)]
+        summary: bool,
+    },
 }
 
 #[tokio::main]
@@ -75,6 +92,12 @@ async fn main() -> Result<()> {
             model,
             max_fix_iterations,
         } => cmd_convert(&path, output, &profile, verify, model, max_fix_iterations).await,
+        Commands::ConvertFile {
+            file,
+            output,
+            verify,
+            summary,
+        } => cmd_convert_file(&file, output, verify, summary),
     }
 }
 
@@ -117,6 +140,97 @@ fn cmd_analyze(path: &Path, format: &str) -> Result<()> {
                 anns.sort();
                 for ann in &anns {
                     println!("  @{}", ann);
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn cmd_convert_file(
+    file: &Path,
+    output: Option<PathBuf>,
+    verify: bool,
+    summary: bool,
+) -> Result<()> {
+    use rust_generator::PatternConverter;
+
+    if !file.exists() {
+        anyhow::bail!("File not found: {}", file.display());
+    }
+    if file.extension().and_then(|e| e.to_str()) != Some("java") {
+        anyhow::bail!("Expected a .java file, got: {}", file.display());
+    }
+
+    println!("=== Pattern-based Java → Rust conversion ===");
+    println!("Source: {}", file.display());
+    println!();
+
+    // Parse the single file via analyze_project on parent dir, then find the file
+    // Alternatively, parse directly
+    let java_file = java_parser::analyze_file(file)?;
+
+    let converter = PatternConverter::new();
+    let result = converter.convert_file(&java_file);
+
+    println!("Module : {}", result.module_name);
+    println!("Converted : {} functions", result.converted_fns.len());
+    println!("Skipped   : {} functions", result.skipped.len());
+
+    if summary {
+        if !result.converted_fns.is_empty() {
+            println!("\n--- Converted ---");
+            for f in &result.converted_fns {
+                println!("  {} → {}", f.java_name, f.rust_name);
+            }
+        }
+        if !result.skipped.is_empty() {
+            println!("\n--- Skipped (non-public/non-static) ---");
+            for name in &result.skipped {
+                println!("  {}", name);
+            }
+        }
+    }
+
+    // Write output
+    let output_dir = output.unwrap_or_else(|| {
+        PathBuf::from("output").join(&result.module_name)
+    });
+    std::fs::create_dir_all(output_dir.join("src"))?;
+
+    // Write Cargo.toml
+    let cargo_toml = format!(
+        r#"[package]
+name = "{name}"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+anyhow = "1"
+"#,
+        name = result.module_name
+    );
+    std::fs::write(output_dir.join("Cargo.toml"), &cargo_toml)?;
+
+    // Write src/lib.rs
+    std::fs::write(output_dir.join("src/lib.rs"), &result.rust_source)?;
+
+    println!("\nOutput: {}", output_dir.display());
+
+    if verify {
+        println!("\n--- Running cargo check ---");
+        let checker = verifier::CompileChecker::new();
+        match checker.check(&output_dir)? {
+            verifier::CompileResult::Success => {
+                println!("cargo check: PASSED ✓");
+            }
+            verifier::CompileResult::Errors(errors) => {
+                println!("cargo check: FAILED ({} errors)", errors.len());
+                for e in &errors {
+                    println!("  {}:{}:{} {}", e.file, e.line, e.column, e.message);
                 }
             }
         }

@@ -383,11 +383,13 @@ fn parse_params(params_str: &str) -> Vec<JavaParam> {
                 return None;
             }
             let annotations = parse_annotations(p);
-            // Remove annotations from the param string
+            // Remove annotations and 'final' modifier from the param string
             let clean = Regex::new(r"@\w+(?:\([^)]*\))?\s*")
                 .unwrap()
                 .replace_all(p, "")
                 .to_string();
+            // Strip leading 'final' keyword (parameter modifier, not part of type)
+            let clean = clean.trim().trim_start_matches("final").trim().to_string();
             let parts: Vec<&str> = clean.split_whitespace().collect();
             if parts.len() >= 2 {
                 Some(JavaParam {
