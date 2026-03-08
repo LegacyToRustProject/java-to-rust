@@ -1,0 +1,18 @@
+[package]
+name = "java-patterns"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dev-dependencies]
+proptest = "1"
+tokio-test = "0.4"
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+
+[dependencies]
+tokio = { workspace = true }
+anyhow = { workspace = true }
+axum = "0.8"
+serde = { workspace = true }
+serde_json = { workspace = true }
